@@ -69,11 +69,6 @@ app.get('/lions', (request, response) => {
     return response.status(200).json(lions)
 })
 
-app.get('/supportchats', (request, response) => {
-    // 
-    return response.status(200).json(lions)
-})
-
 // httpie command: http POST :4000/lions name="Nala"
 // http POST :4000/lions name="Nala" age:=5
 // post /lions
