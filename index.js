@@ -28,6 +28,54 @@
 // 15. post a lion using httpie
 // http POST :4000/lions name="Nala" age:=5
 
+// CHAPTER 4: DB and Sequelize
+// 16. Install sequelize: npm install sequelize
+// 17. Require sequelize
+// 18. Connect db and initialize Sequelize
+// const sequelize = new Sequelize('postgres://postgres:secret@localhost:5432/postgres');
+// 19. Install pg package: npm install pg
+// 20. Define a Model
+// 21. sync the database (connect to the database, and create the tables)
+
+// CHAPTER 5: Start database (optional)
+// a. Start docker deamon
+// b. Create container with postgres
+// docker run -p 5432:5432 --name some-postgres -e POSTGRES_PASSWORD=secret -d postgres
+// if exists: Conflict. The container name "/some-postgres" is already in use by container "e85d963277d97fa704f54fe0076b37e1cfaa2eb327ac0a96df4d1d3d12cb981c".
+// in that case restart: 
+// docker restart e85d963277d97fa704f54fe0076b37e1cfaa2eb327ac0a96df4d1d3d12cb981c
+// c. Check if tables are created successfully in DBeaver or Postico
+// DON'T FORGET TO REFRESH POSTICO / DBEAVER
+
+// CHAPTER 6: Create a lion (for real this time)
+
+
+
+// 17
+const Sequelize = require('sequelize');
+// 18 connection string: 'postgres://postgres:secret@localhost:5432/postgres'
+const sequelize = new Sequelize('postgres://postgres:secret@localhost:5432/postgres');
+
+// 20
+const Lion = sequelize.define('lion', {
+    name: {
+        type: Sequelize.STRING,
+        allowNull: false,
+        unique: true
+    },
+    age: {
+        type: Sequelize.INTEGER,
+        allowNull: false
+    }
+});
+
+sequelize.sync()
+    .then(() => console.log('Tables created successfully'))
+    .catch(err => {
+        console.error('Unable to create tables, shutting down...', err);
+        process.exit(1); // crash program
+    })
+
 // 1
 const express = require('express')
 // 14
@@ -69,23 +117,28 @@ app.get('/lions', (request, response) => {
     return response.status(200).json(lions)
 })
 
-app.get('/supportchats', (request, response) => {
-    // 
-    return response.status(200).json(lions)
-})
-
 // httpie command: http POST :4000/lions name="Nala"
 // http POST :4000/lions name="Nala" age:=5
 // post /lions
 app.post('/lions', (request, response) => {
     // logging request body to see 
     console.log(request.body)
-    // add to array
-    lions.push(request.body)
-    // check if it worked
-    console.log(lions)
 
-    // return correct response and object that was created
-    return response.status(201).send(request.body)
+    // Create Lion using request body
+    Lion.create(request.body)
+        .then(result => { 
+            console.log(result.dataValues)
+
+            // Return the response with the result from the database
+            // We don't need to specify datavalues or anything
+            // Because of sequelize magic?
+            return response.status(201).json(result)
+        })
+    // check if it worked
+    // console.log(lions)
+
+    // If we would send the response here, we would send it before the data is stored :(
+    // DONT
+    // return response.status(201).send(request.body)
 })
 
