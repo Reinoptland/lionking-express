@@ -73,6 +73,7 @@ const Lion = sequelize.define('lion', {
     }
 });
 
+// 21
 sequelize.sync()
     .then(() => console.log('Tables created successfully'))
     .catch(err => {
@@ -156,5 +157,42 @@ app.post('/lions', (request, response) => {
     // If we would send the response here, we would send it before the data is stored :(
     // DONT
     // return response.status(201).send(request.body)
+})
+
+// CHAPTER 7: The killing of Mufasa, delete lions
+// 25. Setup route, with request response and the correct method
+// TEST using HTTPIE if it works
+// http DELETE :4000/lions/9001
+// 26. Get id from the params using request.params (we want id so request.params.id) in this case
+// 27. Use the destroy method with a where object to specify which Lion you want to destroy
+
+app.delete('/lions/:id', (request, response) => {
+    // console.log(parseInt(request.params.id)) check params like this
+
+    const idToDestroy = parseInt(request.params.id)
+
+    // 27
+    Lion.destroy({
+        where: {
+            id: idToDestroy
+        }
+    })
+    .then(numdeleted => {
+        // destory will retrun the number of deleted records
+        console.log('numdeleted:', numdeleted)
+        if(numdeleted === 0){ // if we didn't destroy one it didn't exist
+            response.status(404).end()
+        } else {
+            response.status(204).end() // successfully deleted
+        }
+    })
+    .catch(error => {
+        console.log(error)
+        return response.status(400).send({ message: 'nope' })
+    })
+
+    // Test like this when your making the endpoint, delete when you are using the database
+    // Because it will return a response before the database does
+    // return response.send('We are trying to kill MUFASA')
 })
 
