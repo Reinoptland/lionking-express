@@ -4,6 +4,10 @@
 
 1. Clone this repo
 
+```bash
+~ git clone git@github.com:Reinoptland/lionking-express.git
+```
+
 ## Branches
 
 ### Setup express with GET/POST stored variables
