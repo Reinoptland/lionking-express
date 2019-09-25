@@ -48,6 +48,10 @@
 // DON'T FORGET TO REFRESH POSTICO / DBEAVER
 
 // CHAPTER 6: Create a lion (for real this time)
+// 22. Use th Lion model with the create method to create a Lion
+// Lion.create(request.body)
+// 23. Use .then to get the result and return a response (201) with result from the database
+// 24. Handle errors
 
 
 
@@ -124,8 +128,10 @@ app.post('/lions', (request, response) => {
     // logging request body to see 
     console.log(request.body)
 
+    // 22
     // Create Lion using request body
     Lion.create(request.body)
+        // 23
         .then(result => { 
             console.log(result.dataValues)
 
@@ -133,6 +139,16 @@ app.post('/lions', (request, response) => {
             // We don't need to specify datavalues or anything
             // Because of sequelize magic?
             return response.status(201).json(result)
+        })
+        // Catch errors if the database cannot store the lion
+        // 24
+        .catch(error => {
+            // Specify what went wrong
+            if(error.name === "SequelizeUniqueConstraintError"){
+                return response.status(422).send({ message: 'Name already exists, sorry :('})
+            } else {
+                return response.status(400).send({ message: 'Something went wrong, Hakuna Matata'})
+            }
         })
     // check if it worked
     // console.log(lions)
